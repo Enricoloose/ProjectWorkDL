@@ -1,0 +1,24 @@
+def build_gru_model(embedding_matrix, vectorize_layer):
+    return keras.Sequential([
+        keras.layers.Input(shape=(1,), dtype='string'),
+
+        vectorize_layer,
+
+        keras.layers.Embedding(
+            input_dim=embedding_matrix.shape[0], 
+            output_dim=embedding_matrix.shape[1],
+            mask_zero= True,
+            weights=[embedding_matrix],
+            trainable = False
+        ),
+  
+        keras.layers.Bidirectional(
+            keras.layers.GRU(64,activation='tanh', dropout=dropout, return_sequences=False, kernel_regularizer=keras.regularizers.l2(l2_reg))
+            ),
+        keras.layers.LayerNormalization(),
+
+        keras.layers.Dropout(dropout),
+        keras.layers.Dense(64,activation='relu',kernel_regularizer=keras.regularizers.l2(l2_reg)),
+        keras.layers.Dropout(dropout),
+        keras.layers.Dense(units=7, activation='softmax')
+    ])
